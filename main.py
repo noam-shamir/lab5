@@ -14,7 +14,7 @@ def calc_accuracy(test_set, classifier):
 
 
 if __name__ == '__main__':
-    # comment fo check the repo.
+    # comment fo check the repo hello from git!
     print('Accuracy results:')
     file_name = "./dataset/amazon_cells_labelled_full.txt"
     train_file_name = "./dataset/amazon_cells_labelled_train.txt"
