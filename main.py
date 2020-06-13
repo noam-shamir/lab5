@@ -14,14 +14,19 @@ def calc_accuracy(test_set, classifier):
 
 
 if __name__ == '__main__':
-    # comment fo check the repo hello from git!
     print('Accuracy results:')
     file_name = "./dataset/amazon_cells_labelled_full.txt"
     train_file_name = "./dataset/amazon_cells_labelled_train.txt"
     test_file_name = "./dataset/amazon_cells_labelled_test.txt"
     data = file_reader.FileReader(file_name)
     # boolean
-    train_set, _ = data.build_set("boolean", train_file_name)
-    test_set, _ = data.build_set("boolean", test_file_name)
+    train_set, reg_represantation_train = data.build_set("boolean", train_file_name)
+    test_set, reg_represantation_test = data.build_set("boolean", test_file_name)
     classifier = rocchio_classifier.RocchioClassifier(train_set)
     print("Boolean:", '{:.3f}'.format(calc_accuracy(test_set, classifier)))
+
+    # tf
+    train_set = data.build_set("tf", train_file_name)
+    test_set = data.build_set("tf", test_file_name)
+    classifier = rocchio_classifier.RocchioClassifier(train_set)
+    print("tf:", '{:.3f}'.format(calc_accuracy(test_set, classifier)))
