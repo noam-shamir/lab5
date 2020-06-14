@@ -47,12 +47,12 @@ class RocchioClassifier:
     def predict(self, vector, cosine):
         if cosine:
             winner_class = -1
-            longest_distance = 0
+            longest_distance = -1
             for class_name, class_vector in self.class_centroids.items():
                 distance = self.cosine_similarity(vector, class_vector)
                 if distance > longest_distance:
                     winner_class = class_name
-                    lowest_distance = distance
+                    longest_distance = distance
             return winner_class
         else:
             winner_class = -1
