@@ -11,6 +11,7 @@ class FileReader:
         self.create_stop_words_list()
         self.create_words_bank()
         self.inv_words = {v: k for k, v in self.words.items()}
+        self.doc_amount
 
     def build_set(self, vector_type, file_to_vector):
         if vector_type == 'boolean':
@@ -35,8 +36,10 @@ class FileReader:
 
     def create_words_bank(self):
         index = 0
+        count_of_lines = 0
         with open(self.file, 'r') as reader: # open the file "file"
             for line in reader: # for each line in file
+                count_of_lines += 1
                 seen_in_this_line = []
                 for word in line.split("\t")[0].split(): # for each word in the line
                     word = self.pre_process_word(word)
@@ -51,6 +54,7 @@ class FileReader:
                     if word not in self.words.keys(): # if the word doesnt already exists in the words dictionary
                         self.words[word] = index # add it
                         index += 1
+            self.doc_amount = count_of_lines
 
     def build_set_boolean(self, file_to_vector):
         doc_set = {}
@@ -72,13 +76,12 @@ class FileReader:
         return doc_set, reg_representation
 
     def build_set_tf(self, file_to_vector):
-        count = 0
         doc_set = {}
         reg_representation = {}
         index = 0
         with open(file_to_vector, 'r') as reader:
             for line in reader:
-                vec = len(self.words) * [0.0, ]
+                vec = len(self.words) * [0, ]
                 for word in line.split("\t")[0].split():
                     word = self.pre_process_word(word)
                     if word == '':
@@ -111,11 +114,36 @@ class FileReader:
         #         if doc_set['doc' + str(row_to_change)][index_to_change] != 0:
         #             doc_set['doc' + str(row_to_change)][index_to_change] = \
         #                 1 +math.log10(doc_set['doc' + str(row_to_change)][index_to_change])
-
-        return self.build_set_tf(file_to_vector)
+        return doc_set
 
 
 
     def build_set_tfidf(self, file_to_vector):
-        # TODO: replace with your code
-        return self.build_set_boolean(file_to_vector)
+        doc_set = {}
+        reg_representation = {}
+        index = 0
+        with open(file_to_vector, 'r') as reader:
+            for line in reader:
+                vec = len(self.words) * [0, ]
+                for word in line.split("\t")[0].split():
+                    word = self.pre_process_word(word)
+                    if word == '':
+                        continue
+                    vec[self.words[word]] += 1
+                doc_class = line.split("\t")[1].rstrip()
+                vec.append(doc_class)
+                doc_set['doc' + str(index)] = vec
+                reg_representation['doc' + str(index)] = line.split("\t")[0]
+                index += 1
+
+        upside_dic = {}
+        for key, value in self.words.items():
+            upside_dic[value] = key
+
+        for row_to_change in range(len(doc_set)):
+            for index_to_change in range(len(doc_set['doc' + str(row_to_change)]) - 1):
+                if doc_set['doc' + str(row_to_change)][index_to_change] != 0:
+                    doc_set['doc' + str(row_to_change)][index_to_change] =\
+                        (doc_set['doc' + str(row_to_change)][index_to_change]) *\
+                        math.log10(self.doc_amount/self.df[upside_dic[index_to_change]])
+        return doc_set

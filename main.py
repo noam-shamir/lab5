@@ -2,12 +2,12 @@ import file_reader
 import rocchio_classifier
 
 
-def calc_accuracy(test_set, classifier):
+def calc_accuracy(test_set, classifier, cosine = False):
     correct = 0.0
     total = len(test_set.keys())
     for key in test_set:
         real = test_set[key][-1]
-        predicted = classifier.predict(test_set[key][0:-1])
+        predicted = classifier.predict(test_set[key][0:-1], cosine)
         if real == predicted:
             correct += 1.0
     return correct/total
@@ -30,3 +30,12 @@ if __name__ == '__main__':
     test_set = data.build_set("tf", test_file_name)
     classifier = rocchio_classifier.RocchioClassifier(train_set)
     print("tf:", '{:.3f}'.format(calc_accuracy(test_set, classifier)))
+
+    # tfidf
+    train_set = data.build_set("tfidf", train_file_name)
+    test_set = data.build_set("tfidf", test_file_name)
+    classifier = rocchio_classifier.RocchioClassifier(train_set)
+    print("tfidf:", '{:.3f}'.format(calc_accuracy(test_set, classifier)))
+
+
+    print("tfidf with cosine similarity:", '{:.3f}'.format(calc_accuracy(test_set, classifier, cosine = True)))
